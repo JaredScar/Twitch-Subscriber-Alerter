@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Custom alert starter</title>
+<!--
+  Starter for a custom HTML alert. Rules:
+   - One self-contained file. The overlay runs it in a sandbox with NO network access, so embed
+     images, fonts and sounds as data: URIs. No external <script src>, <link>, fetch() or iframes.
+   - The overlay sends one message once the page has loaded:
+       { type: 'alert', name, count, months, kind, volume }
+         name    who triggered it (gifter / subscriber)
+         count   gifted subs (gift alerts)    months  months subscribed (resubs)
+         kind    'gift' | 'sub' | 'resub' | 'test'
+         volume  0..1 for any audio you play
+   - Reply with  parent.postMessage({ type: 'done' }, '*')  to finish early; otherwise the alert is
+     removed after the "show for" seconds chosen when submitting.
+   - Keep the background transparent: it is shown on top of the game.
+   - The stage is 1920x1080 scaled to the overlay size, so use vw / vh / % units.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; }
+  .stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  .card {
+    text-align: center; color: #fff; padding: 2.5vw 4vw; border-radius: 2vw;
+    background: linear-gradient(135deg, #9147ff, #5b21b6); box-shadow: 0 1.5vw 4vw rgba(0, 0, 0, .5);
+    animation: in .6s cubic-bezier(.2, 1.4, .4, 1) both;
+  }
+  .card.out { animation: out .4s ease-in forwards; }
+  .big { font-size: 7vw; font-weight: 900; line-height: 1; }
+  .small { font-size: 2.6vw; font-weight: 700; margin-top: .6vw; text-shadow: 0 .2vw .4vw rgba(0, 0, 0, .4); }
+  @keyframes in { from { opacity: 0; transform: scale(.4) rotate(-6deg); } to { opacity: 1; transform: none; } }
+  @keyframes out { to { opacity: 0; transform: translateY(-4vh); } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage" hidden>
+  <div class="card" id="card">
+    <div class="big" id="big"></div>
+    <div class="small" id="small"></div>
+  </div>
+</div>
+<script>
+  function show(d) {
+    var big = document.getElementById('big');
+    var small = document.getElementById('small');
+    if (d.kind === 'gift' || d.kind === 'test') {
+      big.textContent = d.count || '?';
+      small.textContent = d.name + ' gifted subs!';
+    } else if (d.kind === 'resub') {
+      big.textContent = (d.months || '?') + ' months';
+      small.textContent = d.name + ' resubscribed!';
+    } else {
+      big.textContent = 'NEW SUB';
+      small.textContent = 'Welcome, ' + d.name + '!';
+    }
+    document.getElementById('stage').hidden = false;
+    // Finish early after 6 seconds (optional).
+    setTimeout(function () {
+      document.getElementById('card').classList.add('out');
+      setTimeout(function () { parent.postMessage({ type: 'done' }, '*'); }, 400);
+    }, 6000);
+  }
+
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.type === 'alert') show(ev.data);
+  });
+
+  // Opened directly in a browser tab (not inside the overlay)? Show a demo.
+  if (window.parent === window) show({ kind: 'gift', name: 'StreamerFan', count: 25 });
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Apache (Laragon default). Nginx users: see README.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# The alert assets never change between releases (overlay.php appends ?v= to bust them),
+# so let browsers / OBS keep them. Big sprite sequence = fetched once.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  <FilesMatch "\.(webp|png|ogg)$">
+    ExpiresDefault "access plus 30 days"
+  </FilesMatch>
+  <FilesMatch "\.(js|css)$">
+    ExpiresDefault "access plus 1 hour"
+  </FilesMatch>
+</IfModule>

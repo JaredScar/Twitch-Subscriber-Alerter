@@ -1,0 +1,19 @@
+{
+	admin off
+	auto_https disable_redirects
+	servers {
+		protocols h1 h2
+	}
+}
+
+# Typing localhost (http, port 80) lands here and is sent to the HTTPS site.
+http:// {
+	redir https://localhost{uri} temporary
+}
+
+# Local HTTPS for Twitch OAuth. The certificate comes from Caddy's local CA
+# (stable for the life of the caddy_data volume).
+https://localhost {
+	tls internal
+	reverse_proxy app:80
+}

@@ -1,0 +1,27 @@
+# Secrets and local data
+.env
+/storage/
+/work/
+*.log
+
+# Private alert pack (artwork, sounds, animation data and source videos): installed locally, never published.
+# Only the starter template and the catalog example are part of the repository.
+/*.webm
+/*.html
+/public/alerts/*
+!/public/alerts/custom-template.html
+!/public/alerts/catalog.example.json
+
+# Measurement scripts for the private alert pack
+/tools/*
+!/tools/cdp.mjs
+
+# Editors / tooling
+.idea/
+.vscode/
+vendor/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

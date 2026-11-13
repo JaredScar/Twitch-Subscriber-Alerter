@@ -1,0 +1,9 @@
+{
+  "alerts": {
+    "gifted-005": { "label": "Gifted subs - 5", "min": 5, "page": "gifted-subs-005.html" },
+    "gifted-010": { "label": "Gifted subs - 10", "min": 10, "page": "gifted-subs-010.html" },
+    "gifted-020": { "label": "Gifted subs - 20", "min": 20, "page": "gifted-subs-020.html" },
+    "gifted-050": { "label": "Gifted subs - 50", "min": 50, "page": "gifted-subs-050.html" },
+    "gifted-100": { "label": "Gifted subs - 100", "min": 100, "page": "gifted-subs-100.html" }
+  }
+}

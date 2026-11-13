@@ -1,0 +1,6 @@
+{
+  "alerts": {
+    "my-alert-small": { "label": "Small gift", "min": 5, "page": "my-alert-small.html" },
+    "my-alert-big": { "label": "Big gift", "min": 50 }
+  }
+}
