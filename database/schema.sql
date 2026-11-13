@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
   react_resub     TINYINT(1)       NOT NULL DEFAULT 1,
   sub_alert       VARCHAR(32)      NULL,
   resub_alert     VARCHAR(32)      NULL,
+  play_mode       VARCHAR(8)       NOT NULL DEFAULT 'queue',   -- how alerts that overlap play: queue or stack
   updated_at      DATETIME         NOT NULL,
   PRIMARY KEY (user_id),
   CONSTRAINT fk_settings_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

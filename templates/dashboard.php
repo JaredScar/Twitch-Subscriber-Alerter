@@ -201,6 +201,17 @@ $alertOptions = static function (?string $selected) use ($catalog, $custom, $e):
       <span><output id="volume-out"><?= (int) $settings['volume'] ?></output>%</span>
     </div>
   </div>
+  <?php $playMode = \App\Users::playMode($settings); ?>
+  <div class="field top-gap">
+    <span class="label">When alerts arrive close together</span>
+    <div class="seg" role="radiogroup" aria-label="Play mode">
+      <label><input type="radio" name="play_mode" value="queue" <?= $playMode === 'queue' ? 'checked' : '' ?>><span><?= View::icon('list') ?> One after the other</span></label>
+      <label><input type="radio" name="play_mode" value="stack" <?= $playMode === 'stack' ? 'checked' : '' ?>><span><?= View::icon('layers') ?> Stack them</span></label>
+    </div>
+    <span class="hint"><strong>One after the other</strong> plays each alert in full, with a short pause between them; up to 10 can wait.
+      <strong>Stack them</strong> plays up to 4 at the same time, and any more wait their turn. Stacked alerts that use the same
+      position on screen draw on top of each other, so give them different positions on the <a href="my-alerts.php">Alerts</a> page.</span>
+  </div>
 
   <div class="savebar">
     <button type="submit" class="btn btn-primary"><?= View::icon('check') ?> Save settings</button>

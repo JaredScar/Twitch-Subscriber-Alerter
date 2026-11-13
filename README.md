@@ -39,8 +39,10 @@ preview page:
 ```
 
 The overlay creates `new GiftedAlerts.Player({ canvas, vignette })` and calls
-`player.play(id, { volume, replayOnClick: false, onend })`, which must return a Promise. `ALERT_CATALOG` in `.env` can
-point at a catalog somewhere else.
+`player.play(id, { volume, replayOnClick: false, onend })`, which must return a Promise. When a streamer chooses to
+stack alerts, the overlay creates one `Player` per alert on screen (each with its own canvas and vignette, at most 4),
+so a `Player` must not share mutable state with other instances. The canvas size is `GiftedAlerts.W` x
+`GiftedAlerts.H` (1920 x 1080 if they are not defined). `ALERT_CATALOG` in `.env` can point at a catalog somewhere else.
 
 ## Local development with Docker
 
@@ -81,7 +83,10 @@ delivers EventSub webhooks to HTTPS on port 443).
 2. `cp .env.example .env` and fill it in (`APP_URL`, `APP_SECRET`, `TWITCH_CLIENT_ID/SECRET`, `DB_*`,
    `ADMIN_TWITCH_LOGINS` = your own Twitch login for the owner view). Keep `APP_ENV=production`.
 3. Use a database user with rights on this one database only, not `root`.
-4. `php bin/migrate.php` creates the database and tables (safe to repeat).
+4. `php bin/migrate.php` creates the tables (safe to repeat). It also creates the database when the
+   database user is allowed to. On shared hosting, create the empty database in the panel first.
+   Run it again after every update: it also adds any columns that newer versions need. (The Docker setup runs it
+   every time the app container starts.)
 5. Point the web server's document root at `public/` (never the project folder).
    * Apache: `public/.htaccess` is included; a root `.htaccess` denies everything as a safety net.
    * nginx: `root .../public; index index.php;` plus the usual PHP-FPM `location ~ \.php$`.
@@ -89,6 +94,10 @@ delivers EventSub webhooks to HTTPS on port 443).
 6. Log in with Twitch on the site. That subscribes your channel to the sub events automatically.
 7. Copy the overlay URL from the dashboard into an OBS **Browser Source** (1920 x 1080, untick "Shutdown source when not
    visible" and "Refresh browser when scene becomes active").
+
+### cPanel
+cPanel and similar shared hosting need a document root pointed at `public/`, a database created in the panel, and PHP
+8.1 or newer. The click-by-click steps are in [docs/cpanel.md](docs/cpanel.md).
 
 ### Private site (only you can log in)
 Set `ADMIN_TWITCH_LOGINS` to your Twitch login (or numeric ID; comma-separated for several) and
@@ -103,6 +112,17 @@ registered keep working overlays (their data stays until you delete them on the 
 * **New subs** and **resubs**: play the alert the streamer picked; each can be switched off. Subs that are gift
   *recipients* are ignored, so a gift is never announced twice. Twitch only reports a resub when the viewer chooses to
   share it.
+
+### Alerts that arrive close together
+Each streamer chooses on the dashboard (**Overlay**, *When alerts arrive close together*) how the overlay handles
+alerts that overlap:
+
+* **One after the other** (default): each alert plays in full with a short pause before the next. Up to 10 can wait;
+  anything beyond that is dropped.
+* **Stack them**: up to 4 alerts play at the same time and any more wait their turn. Alerts that use the same position
+  on screen draw on top of each other, so streamers who stack should give their custom alerts different positions.
+
+The choice is read by the overlay on every poll, so it applies within a few seconds without reloading OBS.
 
 ### Custom alerts (submitted by streamers, vetted by the site owner)
 Streamers can submit their own alerts on the **Alerts** page:

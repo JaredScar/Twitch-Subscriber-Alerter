@@ -31,7 +31,7 @@ if (!$user) {
 }
 
 $alerts = array_keys(AlertCatalog::all());
-$ver = '4';   // bump to bust caches of the alert assets after an update
+$ver = '5';   // bump to bust caches of the alert assets after an update
 ?>
 <!DOCTYPE html>
 <html lang="en">

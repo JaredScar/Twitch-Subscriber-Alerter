@@ -128,6 +128,15 @@ $threw = false;
 try { Config::webhookSecret(); } catch (RuntimeException) { $threw = true; }
 check('a short APP_SECRET is refused', $threw);
 
+// play mode: how alerts that arrive close together play
+check('play mode: queue and stack are the only modes', \App\Users::PLAY_MODES === ['queue', 'stack']);
+check('play mode: stack is kept', \App\Users::playMode(['play_mode' => 'stack']) === 'stack');
+check('play mode: queue is kept', \App\Users::playMode(['play_mode' => 'queue']) === 'queue');
+check('play mode: a settings row from before the column existed means queue', \App\Users::playMode([]) === 'queue');
+foreach ([null, '', 'STACK', 'stack ', 'parallel', 1, ['stack']] as $junk) {
+    check('play mode: ' . json_encode($junk) . ' falls back to queue', \App\Users::playMode(['play_mode' => $junk]) === 'queue');
+}
+
 // optional alert pack
 putenv('ALERT_CATALOG=tests/fixtures/missing.json');
 AlertCatalog::reset();

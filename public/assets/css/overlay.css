@@ -1,6 +1,7 @@
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
-#stage, #vig { position: absolute; inset: 0; width: 100vw; height: 100vh; display: block; }
-#vig { opacity: 0; will-change: opacity; }
+/* #stage / #vig are the first alert layer; overlay.js adds .alert-stage / .alert-vig pairs when alerts stack. */
+#stage, #vig, .alert-stage, .alert-vig { position: absolute; inset: 0; width: 100vw; height: 100vh; display: block; }
+#vig, .alert-vig { opacity: 0; will-change: opacity; }
 #status {
   position: fixed; left: 8px; bottom: 8px; padding: 4px 8px; border-radius: 4px;
   font: 12px/1.3 Consolas, monospace; color: #fff; background: rgba(0, 0, 0, .65);

@@ -16,7 +16,9 @@ const profile = mkdtempSync(join(tmpdir(), 'cdp-'));
 const chrome = spawn(chromePath, [
   '--headless=new', '--disable-gpu', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
   '--window-size=1920,1080', '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required',
-  '--hide-scrollbars', 'about:blank',
+  '--hide-scrollbars',
+  ...(process.env.CHROME_FLAGS ? process.env.CHROME_FLAGS.split(' ') : []),   // e.g. --ignore-certificate-errors for https://localhost
+  'about:blank',
 ], { stdio: 'ignore' });
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));

@@ -6,6 +6,16 @@ namespace App;
 /** Users, their settings and alert rules. */
 final class Users
 {
+    /** How alerts that arrive close together play: one after the other, or on screen at the same time. */
+    public const PLAY_MODES = ['queue', 'stack'];
+
+    /** @param array<string,mixed> $settings a user_settings row; anything unknown (or missing) means 'queue' */
+    public static function playMode(array $settings): string
+    {
+        $mode = $settings['play_mode'] ?? null;
+        return is_string($mode) && in_array($mode, self::PLAY_MODES, true) ? $mode : 'queue';
+    }
+
     public static function find(int $id): ?array
     {
         return Database::one('SELECT * FROM users WHERE id = ?', [$id]);
@@ -133,7 +143,7 @@ final class Users
         $volume = max(0, min(100, (int) ($post['volume'] ?? 80)));
         Database::run(
             'UPDATE user_settings SET overlay_enabled = ?, volume = ?, react_gift = ?, react_sub = ?, react_resub = ?,
-                    sub_alert = ?, resub_alert = ?, updated_at = ? WHERE user_id = ?',
+                    sub_alert = ?, resub_alert = ?, play_mode = ?, updated_at = ? WHERE user_id = ?',
             [
                 empty($post['overlay_enabled']) ? 0 : 1,
                 $volume,
@@ -142,6 +152,7 @@ final class Users
                 empty($post['react_resub']) ? 0 : 1,
                 $alertOrNull($post['sub_alert'] ?? null),
                 $alertOrNull($post['resub_alert'] ?? null),
+                self::playMode(['play_mode' => $post['play_mode'] ?? null]),
                 Database::now(),
                 $userId,
             ]

@@ -16,6 +16,9 @@
 /tools/*
 !/tools/cdp.mjs
 
+# Personal hosting notes for this machine
+docs/*.local.md
+
 # Editors / tooling
 .idea/
 .vscode/
