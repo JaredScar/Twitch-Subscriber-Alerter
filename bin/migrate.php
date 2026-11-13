@@ -41,7 +41,7 @@ try {
         $server = new PDO($dsn($name), $user, $pass, $options);
     }
 
-    $sql = (string) file_get_contents(APP_ROOT . '/database/schema.sql');
+    $sql = (string) file_get_contents(APP_ROOT . '/database/install.sql');
     $sql = preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql;     // strip comment lines
     $count = 0;
     foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
@@ -49,7 +49,7 @@ try {
         $count++;
     }
 
-    // schema.sql only creates missing tables, so columns added in later versions are added here.
+    // install.sql only creates missing tables, so columns added in later versions are added here.
     // (MySQL has no ADD COLUMN IF NOT EXISTS, so look first.)
     $columns = [
         ['user_settings', 'play_mode', "VARCHAR(8) NOT NULL DEFAULT 'queue' AFTER resub_alert"],
@@ -69,7 +69,7 @@ try {
 } catch (Throwable $e) {
     fwrite(STDERR, 'Migration failed: ' . $e->getMessage() . "\n");
     if (stripos($e->getMessage(), 'Access denied') !== false || stripos($e->getMessage(), 'Unknown database') !== false) {
-        fwrite(STDERR, "Create the database and user in your host's control panel, grant that user all rights on it, and set DB_* in .env. You can also import database/schema.sql in phpMyAdmin.\n");
+        fwrite(STDERR, "Create the database and user in your host's control panel, grant that user all rights on it, and set DB_* in .env. You can also import database/install.sql in phpMyAdmin.\n");
     }
     exit(1);
 }

@@ -84,9 +84,10 @@ delivers EventSub webhooks to HTTPS on port 443).
    `ADMIN_TWITCH_LOGINS` = your own Twitch login for the owner view). Keep `APP_ENV=production`.
 3. Use a database user with rights on this one database only, not `root`.
 4. `php bin/migrate.php` creates the tables (safe to repeat). It also creates the database when the
-   database user is allowed to. On shared hosting, create the empty database in the panel first.
-   Run it again after every update: it also adds any columns that newer versions need. (The Docker setup runs it
-   every time the app container starts.)
+   database user is allowed to. On shared hosting, create the empty database in the panel first and import
+   `database/install.sql` in phpMyAdmin instead.
+   Run `php bin/migrate.php` again after every update: it also adds any columns that newer versions need.
+   (The Docker setup runs it every time the app container starts.)
 5. Point the web server's document root at `public/` (never the project folder).
    * Apache: `public/.htaccess` is included; a root `.htaccess` denies everything as a safety net.
    * nginx: `root .../public; index index.php;` plus the usual PHP-FPM `location ~ \.php$`.
@@ -96,8 +97,14 @@ delivers EventSub webhooks to HTTPS on port 443).
    visible" and "Refresh browser when scene becomes active").
 
 ### cPanel
-cPanel and similar shared hosting need a document root pointed at `public/`, a database created in the panel, and PHP
-8.1 or newer. The click-by-click steps are in [docs/cpanel.md](docs/cpanel.md).
+Build one zip and drag it into File Manager:
+
+```
+docker compose exec app php bin/package-cpanel.php
+```
+
+The zip is `dist/twitch-alerter-cpanel.zip`. It includes `database/install.sql` for phpMyAdmin and leaves `.env` out.
+The click-by-click steps are in [docs/cpanel.md](docs/cpanel.md).
 
 ### Private site (only you can log in)
 Set `ADMIN_TWITCH_LOGINS` to your Twitch login (or numeric ID; comma-separated for several) and

@@ -1,5 +1,17 @@
--- Twitch Subscriber Alerter schema (MySQL 8 / MariaDB 10.4+)
--- Run with:  php bin/migrate.php
+-- Twitch Subscriber Alerter, database install (MySQL 8 / MariaDB 10.4 or newer)
+--
+-- cPanel:
+--   1. MySQL Databases: create a database and a user, and add the user to the database
+--      with ALL PRIVILEGES. The panel prefixes both names with your account name.
+--   2. phpMyAdmin: click that database on the left (not the server), then Import,
+--      and choose this file.
+--
+-- This file does not create the database, because on cPanel only the panel can.
+-- Importing it again is safe: tables that already exist are left alone, rows included.
+-- It does not add columns to old tables. After an update, run php bin/migrate.php
+-- from the project folder, which adds any new columns.
+
+SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS users (
   id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -79,7 +91,7 @@ CREATE TABLE IF NOT EXISTS events (
 
 -- Streamer-submitted alerts. Nothing plays until an admin has approved it (status = 'approved').
 -- Submissions are immutable: to change one, delete it and submit a new one.
---   kind        media = uploaded image/GIF/video (+ sound, text);  html = self-contained HTML page
+--   kind        media = uploaded image/GIF/video (+ sound, text).  html = self-contained HTML page
 --   visibility  chosen by the admin on approval: private = only the owner, public = shared library
 CREATE TABLE IF NOT EXISTS custom_alerts (
   id           INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -101,7 +113,7 @@ CREATE TABLE IF NOT EXISTS custom_alerts (
   CONSTRAINT fk_custom_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- When a streamer's overlay (OBS) last polled; powers the "connected" indicator.
+-- When a streamer's overlay (OBS) last polled. Powers the "connected" indicator.
 CREATE TABLE IF NOT EXISTS overlay_seen (
   user_id  INT UNSIGNED NOT NULL,
   seen_at  DATETIME     NOT NULL,

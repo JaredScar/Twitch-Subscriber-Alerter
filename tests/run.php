@@ -128,6 +128,15 @@ $threw = false;
 try { Config::webhookSecret(); } catch (RuntimeException) { $threw = true; }
 check('a short APP_SECRET is refused', $threw);
 
+// cPanel install script: import this in phpMyAdmin after the panel has created the database
+$installSql = (string) file_get_contents(APP_ROOT . '/database/install.sql');
+foreach (['users', 'user_settings', 'alert_rules', 'eventsub_subscriptions', 'events', 'custom_alerts', 'overlay_seen', 'app_state'] as $table) {
+    check("install.sql creates $table", str_contains($installSql, "CREATE TABLE IF NOT EXISTS $table ("));
+}
+check('install.sql sets the play mode column', str_contains($installSql, 'play_mode'));
+check('install.sql does not create a database (cPanel does that)', !preg_match('/CREATE\s+DATABASE/i', $installSql));
+check('install.sql comments contain no semicolons (the importer splits on them)', !preg_match('/^\\s*--.*;/m', $installSql));
+
 // play mode: how alerts that arrive close together play
 check('play mode: queue and stack are the only modes', \App\Users::PLAY_MODES === ['queue', 'stack']);
 check('play mode: stack is kept', \App\Users::playMode(['play_mode' => 'stack']) === 'stack');

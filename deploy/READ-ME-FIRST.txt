@@ -1,0 +1,35 @@
+Twitch Subscriber Alerter — cPanel upload
+
+1. In cPanel File Manager, open your home folder. That is the folder that contains
+   public_html, not public_html itself. Upload the zip and click Extract.
+   You should end up with a folder named twitch-alerter.
+
+2. MySQL Databases: create a database, create a user, and Add User To Database
+   with ALL PRIVILEGES. cPanel prefixes both names with your account name.
+   Copy those full names.
+
+3. phpMyAdmin: click the new database on the left, then Import, and choose
+   twitch-alerter/database/install.sql
+
+4. In File Manager turn on Settings > Show Hidden Files.
+   Copy twitch-alerter/.env.example to twitch-alerter/.env and edit it.
+   APP_URL is https://your-domain with no trailing slash.
+   APP_ENV stays production.
+   DB_HOST stays localhost.
+   DB_NAME and DB_USER are the prefixed names from step 2.
+
+5. Domains: set this domain's document root to
+   /home/USERNAME/twitch-alerter/public
+   MultiPHP Manager: PHP 8.1 or newer.
+   SSL/TLS Status: Run AutoSSL and wait until the certificate is issued.
+
+6. In the Twitch developer console, add this OAuth redirect URL:
+   https://your-domain/callback.php
+   Then open the site and log in.
+
+The document root has to be the public folder. If the domain points at the
+twitch-alerter folder itself, every page is refused on purpose so that .env
+cannot be downloaded.
+
+This zip does not contain a filled-in .env. If the machine that built the zip
+had an alert pack installed, that pack is already in public/alerts/.

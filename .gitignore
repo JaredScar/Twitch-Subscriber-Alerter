@@ -16,6 +16,9 @@
 /tools/*
 !/tools/cdp.mjs
 
+# cPanel upload bundle (bin/package-cpanel.php). It can contain a private alert pack.
+/dist/
+
 # Personal hosting notes for this machine
 docs/*.local.md
 

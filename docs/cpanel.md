@@ -13,28 +13,31 @@ certificate before you log in.
 
 No cron job is required. The overlay polls the site, and Twitch calls the webhook when a sub happens.
 
-## Where the files go
+## Build the zip
 
-Put the project **outside** `public_html`, then point the domain at its `public` folder:
+From the project folder, on the machine that has the site:
+
+```
+docker compose exec app php bin/package-cpanel.php
+```
+
+That writes `dist/twitch-alerter-cpanel.zip`. Drag that one file into cPanel **File Manager** and click **Extract**.
+The zip contains the site, `database/install.sql`, a `.env.example` filled out for cPanel, and `READ-ME-FIRST.txt`
+with the same steps as below. It does not contain `.env`.
+
+If this machine has an alert pack in `public/alerts/`, the zip includes it. A pack is not in the git repository, so a
+zip built from a fresh clone has the starter template only.
+
+Put the extracted folder **outside** `public_html`, then point the domain at its `public` folder:
 
 ```
 /home/USERNAME/twitch-alerter/     .env, src/, storage/, database/
 /home/USERNAME/twitch-alerter/public/    <-- document root
 ```
 
-`USERNAME` is the cPanel account name. Two ways to get the files there:
-
-* **Git.** In cPanel open **Git Version Control**, clone this repository into `/home/USERNAME/twitch-alerter`.
-  A public repository does not need a key.
-* **Upload.** On GitHub use **Code → Download ZIP**, upload that zip in **File Manager**, and extract it into
-  `/home/USERNAME`. Rename the extracted folder to `twitch-alerter` if you want the path above.
-
-Do not extract the project into `public_html` and leave the domain pointed at `public_html`. The project-root
-`.htaccess` would refuse every request, and removing that file while the domain still points at the project folder
-would publish `.env`.
-
-An alert pack is not part of the repository. If you have one, copy it into `public/alerts/` after the code is in
-place. See the repository README for the files a pack contains.
+`USERNAME` is the cPanel account name. Extract in the home folder (the one that contains `public_html`), not inside
+`public_html`. Do not leave the domain pointed at the `twitch-alerter` folder itself. The `.htaccess` there refuses
+every request so that `.env` cannot be downloaded.
 
 ## Database
 
@@ -102,20 +105,22 @@ to `20M` in **MultiPHP INI Editor** for this domain.
 
 ## Create the tables
 
-**Terminal**, from the project folder:
+Open **phpMyAdmin**, click the new database on the left (not the server), choose **Import**, and import
+`twitch-alerter/database/install.sql`.
+
+The file only creates tables. It does not create the database, and importing it again does not erase anything.
+It also does not add columns to tables that already exist.
+
+After a later update, run this from the project folder in **Terminal** so new columns get added:
 
 ```
 cd ~/twitch-alerter
 php bin/migrate.php
 ```
 
-It prints `Database ... ready`. Running it again is safe.
-
-cPanel's **Terminal** `php` is sometimes older than the version you picked for the domain. If `php -v` is below 8.1,
-run the matching binary instead, for example `ea-php83 bin/migrate.php`.
-
-Without Terminal access, open **phpMyAdmin**, select the database, choose **Import**, and import `database/schema.sql`
-from the project folder.
+It prints `Database ... ready`. Running it again is safe. cPanel's **Terminal** `php` is sometimes older than the
+version you picked for the domain. If `php -v` is below 8.1, run the matching binary instead, for example
+`ea-php83 bin/migrate.php`.
 
 ## Twitch
 
