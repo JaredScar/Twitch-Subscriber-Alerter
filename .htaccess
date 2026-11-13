@@ -1,3 +1,13 @@
-# The web root is public/. If a server is pointed at the project folder by mistake, serve nothing
-# (this folder holds .env, the database schema and uploaded files).
-Require all denied
+# Used when the domain points at this folder instead of public/ (typical on shared hosting).
+# Every address is served from public/. A request for /.env becomes public/.env, which does not
+# exist, so the real .env next to this file is never sent. The public/ exception stops a loop.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^public/ - [L]
+  RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# If rewrite is unavailable, serve nothing rather than exposing .env and src/.
+<IfModule !mod_rewrite.c>
+  Require all denied
+</IfModule>

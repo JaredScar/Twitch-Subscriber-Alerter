@@ -158,11 +158,14 @@ saving the dashboard settings can fail after an update that added a setting.
 
 ## When something fails
 
-**Every page is 403.** The document root is the project folder rather than `public/`. Point it at `public/`.
-If the host only allows the site to live inside `public_html` and the homepage is still 403, the project-root
-`.htaccess` (the file that says `Require all denied`) is being applied. Rename that one file on the server, keep
-`public/.htaccess`, and immediately open `https://your-domain/.env`. It must be a 404. If the browser shows the
-file, put the `.htaccess` back and fix the document root before logging in.
+**Every page is 403, and the page says "Access to this resource on the server is denied!".** The domain is pointed
+at the project folder (the one that contains `.env` and `src/`) instead of `public/`. On Hostinger that folder is
+often `public_html/alerts`. In hPanel open **Websites → Manage** for the domain and set the document root to the
+`public` folder inside it, for example `public_html/alerts/public`.
+
+`public/.htaccess` grants access to that folder. The `.htaccess` next to `.env` keeps denying everything else, so
+leave that file in place. After the document root change, `https://your-domain/.env` must not show the file. If the
+homepage is still 403, the server is still using the project folder as the document root.
 
 **A page is 500 or blank.** `APP_ENV=production` hides the message. Read `storage/logs/php-error.log` in File
 Manager, and the domain's entry in cPanel **Errors**. The first request creates `storage/logs`. If that folder

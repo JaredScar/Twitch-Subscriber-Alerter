@@ -1,4 +1,8 @@
-# Apache (Laragon default). Nginx users: see README.
+# Apache. Nginx users: see README.
+# The project-root .htaccess denies every request. This folder is the document root, so grant it.
+# Without this line, a copy installed under public_html stays 403 even after the domain points here.
+Require all granted
+
 Options -Indexes
 DirectoryIndex index.php
 
